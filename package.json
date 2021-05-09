@@ -1,0 +1,17 @@
+{
+  "name": "natours-api",
+  "version": "1.0.0",
+  "description": "Learning how to create an API",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "author": "David Chavarría",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.12.7",
+    "slugify": "^1.5.2"
+  }
+}
