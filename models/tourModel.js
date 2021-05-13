@@ -1,12 +1,16 @@
 const mongoose = require('mongoose');
 const { default: slugify } = require('slugify');
+//const validator = require('validator');
 
 /* Everything outside the schema, it's simple ignored */
 const tourSchema = mongoose.Schema({
     name: {
         type: String,
         required: [true, 'Name for the tour is required!'],
-        unique: true
+        unique: true,
+        maxlength: [40, 'Tour name must have less or equal than 40 characters'],
+        minlength: [10, 'Tour name must have more or equal than 10 characters'],
+        //validate: [validator.isAlpha, 'Must only contain characters'] error with spaces
     },
 
     slug: String,
@@ -23,12 +27,18 @@ const tourSchema = mongoose.Schema({
 
     difficulty: {
         type: String,
-        required: [true, 'Tour has have a difficulty']
+        required: [true, 'Tour has have a difficulty'],
+        enum: {//Validator to limit to types
+            values: ['easy', 'medium', 'difficult'],
+            message: 'Difficult is either: easy, medium, difficult'
+        }
     },
 
     ratingAverage: {
         type: Number,
-        default: 4.5
+        default: 4.5,
+        max: [5, 'Ratings must be below 5.0'],
+        min: [1, 'Ratings must be above 1.0']
     },
 
     ratingQuantity: {
@@ -41,7 +51,15 @@ const tourSchema = mongoose.Schema({
         required: [true, 'A price for the tour must be declared!']
     },
 
-    priceDiscount: Number,
+    priceDiscount: {
+        type: Number,
+        validate: { //Own validator. Function returns true means error.
+            validator: function (value) {
+                return value < this.price; //this refers same doc only in new docs. Updating doesn't
+            },
+            message: 'Discount price ({VALUE}) should be below regular price'
+        }
+    },
 
     summary: {
         type: String,
