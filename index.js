@@ -18,6 +18,8 @@ const express = require('express');
 
 const userRouter = require('./routes/userRoute');
 const tourRouter = require('./routes/tourRoute');
+const AppError = require('./utils/appError');
+const globalErrorHandler = require('./controlles/errorController');
 
 const app = express();
 
@@ -25,6 +27,15 @@ app.use(express.json()); //Middleware: function that modifies the incoming data
 
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/tours', tourRouter);
+
+app.all('*', (req, resp, next) =>{
+
+    /* Sending a parameter inside next, will skip every other middleware and jump right
+    into our error middleware*/
+    next(new AppError(`Can not find ${req.originalUrl} on the server`, 404));
+});
+
+app.use(globalErrorHandler);
 
 /* Versions are useful to implement changes without breaking othe resources*/
 //app.get('/api/v1/tours', getAllTours);
