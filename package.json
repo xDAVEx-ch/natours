@@ -4,7 +4,8 @@
   "description": "Learning how to create an API",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "start:prod": "cross-env NNODE_ENV=production nodemon server.js"
   },
   "author": "David Chavarría",
   "license": "ISC",
@@ -14,5 +15,8 @@
     "mongoose": "^5.12.7",
     "slugify": "^1.5.2",
     "validator": "^13.6.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
   }
 }
