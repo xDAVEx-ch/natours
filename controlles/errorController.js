@@ -38,7 +38,7 @@ const sendErrorProd = (error, resp) => {
             status: error.status,
             message: error.message
         });
-    //Coverting programming errors. Unknown errors. Do not want to leak errors details
+    //Covering programming errors. Unknown errors. Do not want to leak errors details
     } else {
         console.error('Error', error);
 

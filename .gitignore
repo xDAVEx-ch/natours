@@ -3,7 +3,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=node,visualstudiocode,dotenv
 
 ### dotenv ###
-.env
+config.env
 
 ### Node ###
 # Logs
