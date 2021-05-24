@@ -55,7 +55,7 @@ const globalErrorHandler = (error, req, resp, next) => {
     error.statusCode = error.statusCode || 500;
     error.status = error.status || 'error';
 
-    if (process.env.NNODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development') {
         sendErrorDev(error, resp);
     
     } else if (process.env.NNODE_ENV === 'production') {

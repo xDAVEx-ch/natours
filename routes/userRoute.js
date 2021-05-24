@@ -1,9 +1,13 @@
 const express = require('express');
+const authController = require('../controlles/authController');
 
 //Mounting of router
 const router = express.Router();
 
 const userController = require('./../controlles/userController');
+
+router.post('/signup', authController.signUp);
+router.post('/login', authController.logIn);
 
 router.route('/')
     .get(userController.getAllUsers)
