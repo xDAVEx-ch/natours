@@ -4,6 +4,7 @@ const express = require('express');
 const router = express.Router();
 
 const tourController = require('./../controlles/tourController');
+const authController = require('./../controlles/authController');
 
 //router.param('id', tourController.checkId);
 
@@ -15,7 +16,7 @@ router.route('/tour-stats')
     .get(tourController.getTourStats);
 
 router.route('/')
-    .get(tourController.getAllTours)
+    .get(authController.protect, tourController.getAllTours)
 
     /*
         This middleware will never be called. 
