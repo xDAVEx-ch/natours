@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
@@ -42,7 +43,9 @@ const userSchema = new mongoose.Schema({
     passwordChangedAt: {
         type: Date,
         required: [true, 'No creation date']
-    }
+    },
+    passwordResetToken: String,
+    passwordResetExpires: Date
 });
 
 userSchema.pre('save', async function(next) {
@@ -69,6 +72,16 @@ userSchema.methods.changesPasswordAfter = function(JWTtimestamp) {
 
     // False means NOT changed
     return false;
+}
+/* Reset tokens (no JWT) are like passwords. They need encryption and are use to
+let users manage their account. */
+userSchema.methods.createPasswordResetToken = function(){
+    const resetToken = crypto.randomBytes(32).toString('hex');
+
+    this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+    return resetToken;
 }
 const User = mongoose.model('User', userSchema);
 

@@ -115,3 +115,18 @@ exports.restrictTo = (...roles) => {
         next();
     };
 }
+
+exports.forgotPassword = catchAsync(async (req, resp, next) =>{
+    const user = await User.findOne( {email: req.body.email} );
+
+    if(!user){
+        return new AppError('There is not user with this email', 404);
+    }
+
+    const resetToken = user.createPasswordResetToken();
+    await user.save({ validateBeforeSave: false });
+});
+
+exports.resetPassword = () =>{
+
+};
