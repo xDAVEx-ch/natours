@@ -14,6 +14,20 @@ const createSignInToken = (id) => {
 
 const createSendToken = (user, statusCode, resp) =>{
     const token = createSignInToken(user._id);
+    const cookieOptions = {
+        expires: new Date(
+            Date.now() + process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60000
+        ), httpOnly: true
+    }
+
+    //Remove password from output
+    user.password = undefined;
+
+    if(process.env.NODE_ENV === 'production'){
+        cookieOptions.secure = true; //Send this cookie only in https
+    }
+
+    resp.cookie('jwt', token, cookieOptions);
 
     resp.status(statusCode).json({
         status: 'success',
@@ -32,7 +46,8 @@ exports.signUp = catchAsync(async (req, resp, next) => {
             email: req.body.email,
             password: req.body.password,
             passwordConfirm: req.body.passwordConfirm,
-            passwordChangedAt: req.body.passwordChangedAt
+            passwordChangedAt: req.body.passwordChangedAt,
+            role: req.body.role
         }
     );
 
@@ -194,6 +209,9 @@ exports.updatePassword = catchAsync(async (req, resp, next) =>{
     }
 
     //3) Update password if Posted password is correct
+    /* User.findByIdAndUpdate will make our validations not work. Also,
+        all the middlewares including the one in charge of encryption stop working.
+        They use save events */
     user.password = req.body.password;
     user.passwordConfirm = req.body.passwordConfirm;
     await user.save();

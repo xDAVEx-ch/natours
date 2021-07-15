@@ -34,6 +34,8 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Must confirm the password'],
         validate: {
+            //Only works on create and save. Mongoose doesn't keep the current obj in memory
+            //That's why don't use findByIdAndUpdate
             validator: function(element) {
                 return element === this.password
             },
@@ -41,11 +43,16 @@ const userSchema = new mongoose.Schema({
         }
     },
     passwordChangedAt: {
-        type: Date,
-        required: [true, 'No creation date']
+        type: Date
     },
     passwordResetToken: String,
-    passwordResetExpires: Date
+    passwordResetExpires: Date,
+
+    active: {
+        type: Boolean,
+        default: true,
+        select: false
+    }
 });
 
 userSchema.pre('save', async function(next) {
@@ -62,6 +69,28 @@ userSchema.pre('save', async function(next) {
 userSchema.methods.correctPassword = async function(candidatePass, userPass) {
     return await bcrypt.compare(candidatePass, userPass);
 }
+
+userSchema.pre('save', function(next){
+    //isNew returns true when documents are new
+    //Add passwordChangedAt when password is modified and document isn't new
+    if(!this.isModified('password') || this.isNew) return next();
+
+    /* Sometimes the JWT is issue at any moment before our database in MongoDB
+        because saving info in Mongo tend to be slow. To correct this problem,
+        substracting one second to passwordChangedAt will delay enough to finish
+        on time.
+    */
+    this.passwordChangedAt = Date.now() - 1000;
+    next();
+});
+
+userSchema.pre(/^find/, function(next){
+    //this points to the current query
+
+    this.find({ active: {$ne: false} });
+
+    next();
+});
 
 userSchema.methods.changesPasswordAfter = function(JWTtimestamp) {
     if(this.passwordChangedAt){
