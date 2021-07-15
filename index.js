@@ -20,10 +20,52 @@ const userRouter = require('./routes/userRoute');
 const tourRouter = require('./routes/tourRoute');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controlles/errorController');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const hpp = require('hpp');
 
 const app = express();
 
-app.use(express.json()); //Middleware: function that modifies the incoming data
+// GLOBAL MIDDLEWARES
+// Set security HTTP headers
+app.use(helmet());
+
+// Limit requests from same API
+const limiter = rateLimit({
+    max: 100,
+    windowMs: 60 * 60 * 1000,
+    message: 'Too many requests per hour. Wait one hour.'
+});
+
+app.use('/api', limiter);
+
+// Body parser, reading data from body into req.body
+app.use(express.json({ limit: '10kb' })); //Middleware: function that modifies the incoming data
+
+// Data sanitization against NoSQL query injection
+app.use(mongoSanitize());
+
+// Data sanitization against XSS
+/* Mongoose validations are enough to prevent this security issue, however, extra protection
+it's never bad */
+app.use(xss());
+
+// Prevent parameter pollution
+// Whitelist to duplicate fields
+app.use(
+    hpp({
+      whitelist: [
+        'duration',
+        'ratingsQuantity',
+        'ratingsAverage',
+        'maxGroupSize',
+        'difficulty',
+        'price'
+      ]
+    })
+  );
 
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/tours', tourRouter);
