@@ -18,6 +18,7 @@ const express = require('express');
 
 const userRouter = require('./routes/userRoute');
 const tourRouter = require('./routes/tourRoute');
+const reviewRouter = require('./routes/reviewRoute');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controlles/errorController');
 const rateLimit = require('express-rate-limit');
@@ -69,6 +70,7 @@ app.use(
 
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 app.all('*', (req, resp, next) =>{
 
