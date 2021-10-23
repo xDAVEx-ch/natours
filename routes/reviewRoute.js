@@ -1,16 +1,30 @@
 const express = require('express');
 
 //Mounting of router
-const router = express.Router();
+//Mergin params we get access to parameters from the route that uses this one
+const router = express.Router({ mergeParams: true });
 
 const authController = require('./../controlles/authController');
 const reviewController = require('./../controlles/reviewController');
 
-router.route('/').get(authController.protect, reviewController.getAllReviews);
+router.use(authController.protect);
+
+router.route('/').get(reviewController.getAllReviews);
 router.route('/')
     .post(
-        authController.protect,
         authController.restrictTo('user'),
+        reviewController.setTourAndUserId,
         reviewController.createReview);
+
+router.route('/:id')
+    .get(reviewController.getReview)
+    .patch(
+        authController.restrictTo('admin', 'user'),
+        reviewController.updateReview
+    )
+    .delete(
+        authController.restrictTo('admin', 'user'),
+        reviewController.deleteReview
+    );
 
 module.exports = router;

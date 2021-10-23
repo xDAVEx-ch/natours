@@ -8,13 +8,21 @@ const userController = require('./../controlles/userController');
 
 router.post('/signup', authController.signUp);
 router.post('/login', authController.logIn);
-
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
-router.patch('/updateMyPassword', authController.protect, authController.updatePassword);
-router.patch('/updateMe', authController.protect, userController.updateMe);
 
-router.delete('/deleteMe', authController.protect, userController.deleteMe);
+//Protecting all routes after this middleware
+router.use(authController.protect);
+
+router.patch('/updateMyPassword', authController.updatePassword);
+router.patch('/updateMe', userController.updateMe);
+
+router.delete('/deleteMe', userController.deleteMe);
+
+router.get('/me', userController.getMe, userController.getUser)
+
+//Restriction to all routes after this middleware
+router.use(authController.restrictTo('admin'));
 
 router.route('/')
     .get(userController.getAllUsers)
@@ -22,7 +30,7 @@ router.route('/')
 
 router.route('/:id')
     .get(userController.getUser)
-    .put(userController.updateUser)
+    .patch(userController.updateUser)
     .delete(userController.deleteUser);
 
 module.exports = router;
