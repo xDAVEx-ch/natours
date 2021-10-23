@@ -76,7 +76,7 @@ exports.logIn = catchAsync(async (req, resp, next) => {
     }
 
     //3) Send response
-    createSendToken(user, 20, resp);
+    createSendToken(user, 200, resp);
 })
 
 exports.protect = catchAsync(async (req, resp, next) => {

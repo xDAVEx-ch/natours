@@ -1,7 +1,8 @@
 const catchAsync = require('../utils/catchAsync');
 const Tour = require('./../models/tourModel');
-const APIFeatures = require('./../utils/apiFeatures');
-const AppError = require('../utils/appError');
+//const APIFeatures = require('./../utils/apiFeatures');
+//const AppError = require('../utils/appError');
+const factory = require('./handlerFactory');
 
 /*const fs = require('fs');
 const toursData = fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`);
@@ -39,7 +40,9 @@ exports.aliasTopTours = (req, resp, next) => {
     next();
 }
 
-exports.getAllTours = catchAsync(async (req, resp, next) => {
+exports.getAllTours = factory.getAll(Tour);
+
+/*exports.getAllTours = catchAsync(async (req, resp, next) => {
 
     /* Queries to MongoDB req.query
     const tour = await Tour.find({
@@ -55,7 +58,7 @@ exports.getAllTours = catchAsync(async (req, resp, next) => {
      */
 
         //Execute query
-        const features = new APIFeatures(Tour.find(), req.query)
+        /*const features = new APIFeatures(Tour.find(), req.query)
             .filter()
             .sort()
             .limitFields()
@@ -71,14 +74,17 @@ exports.getAllTours = catchAsync(async (req, resp, next) => {
             }
         });
     //No next() function. End of request-response cycle
-})
+})*/
 
-exports.getTour = catchAsync(async (req, resp, next) => {
+exports.getTour = factory.getOne(Tour, {path: 'reviews'});
+
+/*exports.getTour = catchAsync(async (req, resp, next) => {
 
     /*const id = req.params.id * 1; //string * number === number
     const tour = tours.find((element) => element.id === id);*/
 
-    const tour = await Tour.findById(req.params.id);
+    //Name of th field we want to populate
+    /*const tour = await Tour.findById(req.params.id).populate('reviews');
 
     if(!tour){
         return next(new AppError('No tour found with that ID'));
@@ -90,7 +96,7 @@ exports.getTour = catchAsync(async (req, resp, next) => {
             tour
         }
     });
-})
+})*/
 
 /*Old createTour
 exports.createTour = (req, resp) => {
@@ -110,7 +116,8 @@ exports.createTour = (req, resp) => {
     });
 }*/
 
-exports.createTour = catchAsync(async (req, resp, next) => {
+exports.createTour = factory.createOne(Tour);
+/*exports.createTour = catchAsync(async (req, resp, next) => {
 
     const newTour = await Tour.create(req.body);
 
@@ -120,9 +127,10 @@ exports.createTour = catchAsync(async (req, resp, next) => {
             tour: newTour
         }
     });
-})
+})*/
 
-exports.updateTour = catchAsync(async (req, resp, next) => {
+exports.updateTour = factory.updateOne(Tour);
+/*exports.updateTour = catchAsync(async (req, resp, next) => {
     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
         new: true
     });
@@ -137,9 +145,10 @@ exports.updateTour = catchAsync(async (req, resp, next) => {
             tour
         }
     });
-})
+})*/
 
-exports.deleteTour = catchAsync(async (req, resp, next) => {
+exports.deleteTour = factory.deleteOne(Tour);
+/*exports.deleteTour = catchAsync(async (req, resp, next) => {
 
     const tour = await Tour.findByIdAndDelete(req.params.id);
 
@@ -153,7 +162,7 @@ exports.deleteTour = catchAsync(async (req, resp, next) => {
             tour: `Deleted tour id: ${req.params.id}`
         }
     });
-})
+})*/
 
 /* The MongoDB aggregation pipeline consists of stages. 
 Each stage transforms the documents as they pass through the pipeline */

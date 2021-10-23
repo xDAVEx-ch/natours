@@ -1,6 +1,7 @@
 const catchAsync = require('../utils/catchAsync');
 const User = require('./../models/userModel');
 const AppError = require('./../utils/appError');
+const factory = require('./handlerFactory');
 
 removeBodyEl = (obj, ...allowedFields) =>{
     const newObj = {};
@@ -14,21 +15,22 @@ removeBodyEl = (obj, ...allowedFields) =>{
     return newObj;
 }
 
-exports.getAllUsers = catchAsync(async (req, resp, next) =>{
+exports.getAllUsers = factory.getAll(User);
+/*exports.getAllUsers = catchAsync(async (req, resp, next) =>{
     const user = await User.find();
 
     resp.status(500).json({
-        status: 'error',
+        status: 'success',
         data: {
             user
         }
     });
-})
+})*/
 
 exports.createUser = (req, resp) =>{
     resp.status(500).json({
         status: 'error',
-        message: 'Route not defined yet!'
+        message: 'Route not defined yet! Please user signup'
     });
 }
 
@@ -59,6 +61,12 @@ exports.updateMe = catchAsync(async (req, resp, next) =>{
     });
 })
 
+exports.getMe = (req, resp, next) =>{
+    req.params.id = req.user.id;
+
+    next();
+}
+
 exports.deleteMe = catchAsync(async (req, resp, next) =>{
     await User.findByIdAndUpdate(req.user.id, {active: false});
 
@@ -68,23 +76,28 @@ exports.deleteMe = catchAsync(async (req, resp, next) =>{
     });
 });
 
-exports.getUser = (req, resp) =>{
+exports.getUser = factory.getOne(User);
+/*exports.getUser = (req, resp) =>{
     resp.status(500).json({
         status: 'error',
         message: 'Route not defined yet!'
     });
-}
+}*/
 
-exports.updateUser = (req, resp) =>{
+/*exports.updateUser = (req, resp) =>{
     resp.status(500).json({
         status: 'error',
         message: 'Route not defined yet!'
     });
-}
+}*/
 
-exports.deleteUser = (req, resp) =>{
+//Do not update password with this
+exports.updateUser = factory.updateOne(User);
+exports.deleteUser = factory.deleteOne(User);
+
+/*exports.deleteUser = (req, resp) =>{
     resp.status(500).json({
         status: 'error',
         message: 'Route not defined yet!'
     });
-}
+}*/
